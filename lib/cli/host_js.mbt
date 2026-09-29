@@ -1,4 +1,4 @@
-extern "js" fn host_read_text_ffi(path : String) -> Array[String] =
+extern "js" fn host_read_text_ffi(path : String) -> FixedArray[String] =
   #| function(path) {
   #|   const fs = require("node:fs");
   #|   try {
@@ -7,7 +7,6 @@ extern "js" fn host_read_text_ffi(path : String) -> Array[String] =
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
 fn host_read_text(path : String) -> Result[String, String] {
   let result = host_read_text_ffi(path)
   if result.length() >= 2 && result[0] == "ok" {
@@ -19,7 +18,7 @@ fn host_read_text(path : String) -> Result[String, String] {
   }
 }
 
-extern "js" fn host_write_text_ffi(path : String, content : String) -> Array[String] =
+extern "js" fn host_write_text_ffi(path : String, content : String) -> FixedArray[String] =
   #| function(path, content) {
   #|   const fs = require("node:fs");
   #|   const nodePath = require("node:path");
@@ -31,7 +30,6 @@ extern "js" fn host_write_text_ffi(path : String, content : String) -> Array[Str
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
 fn host_write_text(path : String, content : String) -> Result[Unit, String] {
   let result = host_write_text_ffi(path, content)
   if result.length() >= 1 && result[0] == "ok" {
@@ -49,7 +47,7 @@ extern "js" fn host_file_exists(path : String) -> Bool =
   #|   return fs.existsSync(path);
   #| }
 
-extern "js" fn host_list_files_ffi(path : String) -> Array[String] =
+extern "js" fn host_list_files_ffi(path : String) -> FixedArray[String] =
   #| function(path) {
   #|   const fs = require("node:fs");
   #|   const nodePath = require("node:path");
@@ -69,7 +67,6 @@ extern "js" fn host_list_files_ffi(path : String) -> Array[String] =
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
 fn host_list_files(path : String) -> Result[Array[String], String] {
   let result = host_list_files_ffi(path)
   if result.length() >= 2 && result[0] == "err" {
@@ -82,7 +79,7 @@ fn host_list_files(path : String) -> Result[Array[String], String] {
   Ok(files)
 }
 
-extern "js" fn host_run_command_ffi(command : String, cwd : String) -> Array[String] =
+extern "js" fn host_run_command_ffi(command : String, cwd : String) -> FixedArray[String] =
   #| function(command, cwd) {
   #|   const childProcess = require("node:child_process");
   #|   try {
@@ -106,7 +103,6 @@ extern "js" fn host_run_command_ffi(command : String, cwd : String) -> Array[Str
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
 fn host_run_command(
   command : String,
   cwd : String
@@ -205,9 +201,9 @@ extern "js" fn host_exit_process(code : Int) -> Unit =
 ///
 /// 如果 stdin/stdout 是 TTY：raw mode + ANSI 高亮 + 原地重绘。
 /// 否则：退化到「编号列表 + 输入数字」的同步 prompt（兼容管道/CI）。
-extern "js" fn host_select_from_list_ffi(
+extern "js" fn host_select_from_list_ffi_fixed(
   title : String,
-  items : Array[String],
+  items : FixedArray[String],
   initial : Int
 ) -> Int =
   #| function(title, items, initial) {
@@ -365,6 +361,14 @@ extern "js" fn host_select_from_list_ffi(
   #|   stdout.write("\n");
   #|   return selected;
   #| }
+
+fn host_select_from_list_ffi(
+  title : String,
+  items : Array[String],
+  initial : Int
+) -> Int {
+  host_select_from_list_ffi_fixed(title, FixedArray::from_array(items), initial)
+}
 
 fn host_select_from_list(title : String, items : Array[String], initial : Int) -> Int {
   host_select_from_list_ffi(title, items, initial)

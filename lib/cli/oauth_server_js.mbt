@@ -9,7 +9,7 @@ extern "js" fn host_wait_cli_callback_ffi(
   port : Int,
   expected_state : String,
   timeout_ms : Int
-) -> Array[String] =
+) -> FixedArray[String] =
   #|(port, expectedState, timeoutMs) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -86,7 +86,6 @@ extern "js" fn host_wait_cli_callback_ffi(
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| 等待 NyxID CLI callback。
 ///
 /// 返回 Ok((access_token, refresh_token_option, state))。
@@ -118,7 +117,7 @@ extern "js" fn host_wait_oauth_callback_ffi(
   port : Int,
   expected_state : String,
   timeout_ms : Int
-) -> Array[String] =
+) -> FixedArray[String] =
   #|(port, expectedState, timeoutMs) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -187,9 +186,8 @@ extern "js" fn host_wait_oauth_callback_ffi(
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| POST form-encoded 到 token endpoint，返回 JSON 响应文本。
-extern "js" fn host_post_form_ffi(url : String, form_body : String) -> Array[String] =
+extern "js" fn host_post_form_ffi(url : String, form_body : String) -> FixedArray[String] =
   #|(url, formBody) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -237,7 +235,6 @@ extern "js" fn host_post_form_ffi(url : String, form_body : String) -> Array[Str
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| 打开用户默认浏览器到指定 URL。
 extern "js" fn host_open_browser_ffi(url : String) -> Unit =
   #|(url) => {
@@ -291,7 +288,7 @@ fn host_post_form(url : String, form_body : String) -> Result[(Int, String), Str
 }
 
 ///| GET 请求（Bearer 认证），返回 (status_code, body) 或 Err。
-extern "js" fn host_get_bearer_ffi(url : String, bearer : String) -> Array[String] =
+extern "js" fn host_get_bearer_ffi(url : String, bearer : String) -> FixedArray[String] =
   #|(url, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -336,7 +333,6 @@ extern "js" fn host_get_bearer_ffi(url : String, bearer : String) -> Array[Strin
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| 无认证 GET 请求。
 fn host_get(url : String) -> Result[(Int, String), String] {
   host_get_bearer(url, "")
@@ -367,7 +363,7 @@ fn host_open_browser(url : String) -> Unit {
 }
 
 ///| POST JSON body with Bearer auth. Returns (status, body).
-extern "js" fn host_post_json_bearer_ffi(url : String, body : String, bearer : String) -> Array[String] =
+extern "js" fn host_post_json_bearer_ffi(url : String, body : String, bearer : String) -> FixedArray[String] =
   #|(url, body, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -418,9 +414,8 @@ extern "js" fn host_post_json_bearer_ffi(url : String, body : String, bearer : S
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| DELETE with Bearer auth. Returns (status, body).
-extern "js" fn host_delete_bearer_ffi(url : String, bearer : String) -> Array[String] =
+extern "js" fn host_delete_bearer_ffi(url : String, bearer : String) -> FixedArray[String] =
   #|(url, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -465,7 +460,6 @@ extern "js" fn host_delete_bearer_ffi(url : String, bearer : String) -> Array[St
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 fn host_post_json_bearer(url : String, body : String, bearer : String) -> Result[(Int, String), String] {
   let result = host_post_json_bearer_ffi(url, body, bearer)
   if result.length() == 0 { return Err("empty response") }

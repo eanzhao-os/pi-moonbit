@@ -1,6 +1,6 @@
 ///| 通过 JS fetch API 进行 OpenAI 兼容的流式 SSE 请求。
 /// 接收请求体 JSON，返回完整 SSE 文本（同步阻塞直到流结束）。
-extern "js" fn host_fetch_sse_ffi(url : String, body : String, api_key : String, extra_headers : String) -> Array[String] =
+extern "js" fn host_fetch_sse_ffi(url : String, body : String, api_key : String, extra_headers : String) -> FixedArray[String] =
   #|(url, body, apiKey, extraHeaders) => {
   #|  try {
   #|    const headers = { "Content-Type": "application/json" };
@@ -104,7 +104,6 @@ extern "js" fn host_fetch_sse_ffi(url : String, body : String, api_key : String,
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
 ///| 发起 Anthropic Messages API 流式请求并通过 EventHandler 推送事件。
 fn host_anthropic_stream(
   model : @ai.Model,
