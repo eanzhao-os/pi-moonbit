@@ -1,4 +1,4 @@
-extern "js" fn host_read_text_ffi_fixed(path : String) -> FixedArray[String] =
+extern "js" fn host_read_text_ffi(path : String) -> FixedArray[String] =
   #| function(path) {
   #|   const fs = require("node:fs");
   #|   try {
@@ -7,11 +7,6 @@ extern "js" fn host_read_text_ffi_fixed(path : String) -> FixedArray[String] =
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
-fn host_read_text_ffi(path : String) -> Array[String] {
-  Array::from_fixed_array(host_read_text_ffi_fixed(path))
-}
-
 fn host_read_text(path : String) -> Result[String, String] {
   let result = host_read_text_ffi(path)
   if result.length() >= 2 && result[0] == "ok" {
@@ -23,7 +18,7 @@ fn host_read_text(path : String) -> Result[String, String] {
   }
 }
 
-extern "js" fn host_write_text_ffi_fixed(path : String, content : String) -> FixedArray[String] =
+extern "js" fn host_write_text_ffi(path : String, content : String) -> FixedArray[String] =
   #| function(path, content) {
   #|   const fs = require("node:fs");
   #|   const nodePath = require("node:path");
@@ -35,11 +30,6 @@ extern "js" fn host_write_text_ffi_fixed(path : String, content : String) -> Fix
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
-fn host_write_text_ffi(path : String, content : String) -> Array[String] {
-  Array::from_fixed_array(host_write_text_ffi_fixed(path, content))
-}
-
 fn host_write_text(path : String, content : String) -> Result[Unit, String] {
   let result = host_write_text_ffi(path, content)
   if result.length() >= 1 && result[0] == "ok" {
@@ -57,7 +47,7 @@ extern "js" fn host_file_exists(path : String) -> Bool =
   #|   return fs.existsSync(path);
   #| }
 
-extern "js" fn host_list_files_ffi_fixed(path : String) -> FixedArray[String] =
+extern "js" fn host_list_files_ffi(path : String) -> FixedArray[String] =
   #| function(path) {
   #|   const fs = require("node:fs");
   #|   const nodePath = require("node:path");
@@ -77,11 +67,6 @@ extern "js" fn host_list_files_ffi_fixed(path : String) -> FixedArray[String] =
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
-fn host_list_files_ffi(path : String) -> Array[String] {
-  Array::from_fixed_array(host_list_files_ffi_fixed(path))
-}
-
 fn host_list_files(path : String) -> Result[Array[String], String] {
   let result = host_list_files_ffi(path)
   if result.length() >= 2 && result[0] == "err" {
@@ -94,7 +79,7 @@ fn host_list_files(path : String) -> Result[Array[String], String] {
   Ok(files)
 }
 
-extern "js" fn host_run_command_ffi_fixed(command : String, cwd : String) -> FixedArray[String] =
+extern "js" fn host_run_command_ffi(command : String, cwd : String) -> FixedArray[String] =
   #| function(command, cwd) {
   #|   const childProcess = require("node:child_process");
   #|   try {
@@ -118,11 +103,6 @@ extern "js" fn host_run_command_ffi_fixed(command : String, cwd : String) -> Fix
   #|     return ["err", error && error.message ? String(error.message) : String(error)];
   #|   }
   #| }
-
-fn host_run_command_ffi(command : String, cwd : String) -> Array[String] {
-  Array::from_fixed_array(host_run_command_ffi_fixed(command, cwd))
-}
-
 fn host_run_command(
   command : String,
   cwd : String

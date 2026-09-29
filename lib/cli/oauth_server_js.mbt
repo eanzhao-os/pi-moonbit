@@ -5,7 +5,7 @@
 
 ///| 等待 NyxID CLI 流程的 callback：直接接收 access_token（无需 code 换 token）。
 /// 返回 ["ok", access_token, refresh_token_or_empty, state] 或 ["err", msg] 或 ["timeout"]。
-extern "js" fn host_wait_cli_callback_ffi_fixed(
+extern "js" fn host_wait_cli_callback_ffi(
   port : Int,
   expected_state : String,
   timeout_ms : Int
@@ -86,15 +86,6 @@ extern "js" fn host_wait_cli_callback_ffi_fixed(
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_wait_cli_callback_ffi(
-  port : Int,
-  expected_state : String,
-  timeout_ms : Int
-) -> Array[String] {
-  Array::from_fixed_array(host_wait_cli_callback_ffi_fixed(port, expected_state, timeout_ms))
-}
-
 ///| 等待 NyxID CLI callback。
 ///
 /// 返回 Ok((access_token, refresh_token_option, state))。
@@ -122,7 +113,7 @@ fn host_wait_cli_callback(
 
 ///| 等待 OAuth redirect 回调。
 /// 返回 ["ok", code, state] 或 ["err", message] 或 ["timeout"]。
-extern "js" fn host_wait_oauth_callback_ffi_fixed(
+extern "js" fn host_wait_oauth_callback_ffi(
   port : Int,
   expected_state : String,
   timeout_ms : Int
@@ -195,17 +186,8 @@ extern "js" fn host_wait_oauth_callback_ffi_fixed(
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_wait_oauth_callback_ffi(
-  port : Int,
-  expected_state : String,
-  timeout_ms : Int
-) -> Array[String] {
-  Array::from_fixed_array(host_wait_oauth_callback_ffi_fixed(port, expected_state, timeout_ms))
-}
-
 ///| POST form-encoded 到 token endpoint，返回 JSON 响应文本。
-extern "js" fn host_post_form_ffi_fixed(url : String, form_body : String) -> FixedArray[String] =
+extern "js" fn host_post_form_ffi(url : String, form_body : String) -> FixedArray[String] =
   #|(url, formBody) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -253,11 +235,6 @@ extern "js" fn host_post_form_ffi_fixed(url : String, form_body : String) -> Fix
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_post_form_ffi(url : String, form_body : String) -> Array[String] {
-  Array::from_fixed_array(host_post_form_ffi_fixed(url, form_body))
-}
-
 ///| 打开用户默认浏览器到指定 URL。
 extern "js" fn host_open_browser_ffi(url : String) -> Unit =
   #|(url) => {
@@ -311,7 +288,7 @@ fn host_post_form(url : String, form_body : String) -> Result[(Int, String), Str
 }
 
 ///| GET 请求（Bearer 认证），返回 (status_code, body) 或 Err。
-extern "js" fn host_get_bearer_ffi_fixed(url : String, bearer : String) -> FixedArray[String] =
+extern "js" fn host_get_bearer_ffi(url : String, bearer : String) -> FixedArray[String] =
   #|(url, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -356,11 +333,6 @@ extern "js" fn host_get_bearer_ffi_fixed(url : String, bearer : String) -> Fixed
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_get_bearer_ffi(url : String, bearer : String) -> Array[String] {
-  Array::from_fixed_array(host_get_bearer_ffi_fixed(url, bearer))
-}
-
 ///| 无认证 GET 请求。
 fn host_get(url : String) -> Result[(Int, String), String] {
   host_get_bearer(url, "")
@@ -391,7 +363,7 @@ fn host_open_browser(url : String) -> Unit {
 }
 
 ///| POST JSON body with Bearer auth. Returns (status, body).
-extern "js" fn host_post_json_bearer_ffi_fixed(url : String, body : String, bearer : String) -> FixedArray[String] =
+extern "js" fn host_post_json_bearer_ffi(url : String, body : String, bearer : String) -> FixedArray[String] =
   #|(url, body, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -442,13 +414,8 @@ extern "js" fn host_post_json_bearer_ffi_fixed(url : String, body : String, bear
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_post_json_bearer_ffi(url : String, body : String, bearer : String) -> Array[String] {
-  Array::from_fixed_array(host_post_json_bearer_ffi_fixed(url, body, bearer))
-}
-
 ///| DELETE with Bearer auth. Returns (status, body).
-extern "js" fn host_delete_bearer_ffi_fixed(url : String, bearer : String) -> FixedArray[String] =
+extern "js" fn host_delete_bearer_ffi(url : String, bearer : String) -> FixedArray[String] =
   #|(url, bearer) => {
   #|  try {
   #|    const { execSync } = require("child_process");
@@ -493,11 +460,6 @@ extern "js" fn host_delete_bearer_ffi_fixed(url : String, bearer : String) -> Fi
   #|    return ["err", e.message || String(e)];
   #|  }
   #|}
-
-fn host_delete_bearer_ffi(url : String, bearer : String) -> Array[String] {
-  Array::from_fixed_array(host_delete_bearer_ffi_fixed(url, bearer))
-}
-
 fn host_post_json_bearer(url : String, body : String, bearer : String) -> Result[(Int, String), String] {
   let result = host_post_json_bearer_ffi(url, body, bearer)
   if result.length() == 0 { return Err("empty response") }
